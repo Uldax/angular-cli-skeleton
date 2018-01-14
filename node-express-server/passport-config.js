@@ -24,12 +24,14 @@
 
 'use strict';
 
+const config = require('./config');
+
 let jwtOptions;
 
 module.exports.buildJwtOptions = jwtFromRequest => {
   jwtOptions = {};
   jwtOptions.jwtFromRequest = jwtFromRequest;
-  jwtOptions.secretOrKey = 'secret key bla bla';
+  jwtOptions.secretOrKey = config.JWT_SECRET;
   return jwtOptions;
 };
 
