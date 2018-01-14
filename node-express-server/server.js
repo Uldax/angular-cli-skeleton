@@ -46,7 +46,6 @@ let express = require('express');
 let bodyParser = require('body-parser');
 let cookieParser = require('cookie-parser');
 let compression = require('compression');
-let redis = require('redis');
 
 let Utils = require('./util');
 let db = require('./db');
@@ -54,18 +53,6 @@ let path = require('path');
 let app = express();
 
 let morgan = require('morgan');
-
-// --------------------------------------------------------
-// -----------------------Redis init-----------------------
-// --------------------------------------------------------
-// Init REDIS (below I add also redis to express session thanks to connect-redis)
-// let redis = require('redis');
-// let client = redis.createClient();
-// let RedisStore = require('connect-redis')(session);
-// let redisStore = bluebird.promisifyAll(new RedisStore({host: config.REDIS_HOST, port: config.REDIS_PORT, client: client, ttl: config.REDIS_TTL}));
-// --------------------------------------------------------
-// --------------------------------------------------------
-// --------------------------------------------------------
 
 // --------------------------------------------------------
 // --------------------------------------------------------
@@ -314,14 +301,14 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-// we need this because 'cookie' is true in csrf
-app.use(cookieParser());
-
 app.use(passport.initialize());
 app.use(passport.session());
 
 // compress all requests using gzip
 app.use(compression());
+
+// we need this because 'cookie' is true in csrf
+app.use(cookieParser());
 
 
 logger.warn('Initializing REST apis and CSRF');
@@ -331,7 +318,14 @@ logger.warn('Initializing REST apis and CSRF');
 // before app.use(APIS.BASE_API_PATH, routesApi); to protect their,
 // but after session and/or cookie initialization.
 // csrf requires cookieParser
-// app.use(csrf({cookie: true}));
+// let csrfProtection = csrf({
+//   cookie: true,
+//   value: (req) => req.headers['X-XSRF-TOKEN']
+//   // key: 'KS_CSRF_COOKIE', // must match the name defined in HttpClientModule on client side
+//   // path: '/'
+// });
+//
+// app.use(csrfProtection);
 //
 // // catch bad csrf token
 // app.use((err, req, res, next) => {
@@ -341,7 +335,7 @@ logger.warn('Initializing REST apis and CSRF');
 // });
 //
 // app.use((req, res, next) => {
-//   res.cookie('XSRF-TOKEN', req.csrfToken());
+//   res.cookie('_csrf', req.csrfToken());
 //   next();
 // });
 

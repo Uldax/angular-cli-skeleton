@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClientXsrfModule } from '@angular/common/http';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -29,7 +29,13 @@ import { AppComponent } from './app.component';
     // the page.
     BrowserModule.withServerTransition({ appId: 'my-app' }),
     BrowserAnimationsModule,
+
     HttpClientModule,
+    HttpClientXsrfModule.withOptions({
+      cookieName: '_csrf',
+      headerName: 'X-XSRF-TOKEN'
+    }),
+
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
