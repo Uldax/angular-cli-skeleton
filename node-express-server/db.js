@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+'use strict';
+
 let tokens = [];
 
 let dbMock = [

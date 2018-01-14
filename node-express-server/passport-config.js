@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+'use strict';
+
 let jwtOptions;
 
 module.exports.buildJwtOptions = jwtFromRequest => {
