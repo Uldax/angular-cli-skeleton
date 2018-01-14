@@ -6,9 +6,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
+import { ToastrModule } from 'ngx-toastr';
+import { LaddaModule } from 'angular2-ladda';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
 import { mainReducers } from './reducers';
 
 import { environment } from '../environments/environment';
@@ -18,7 +20,7 @@ import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core/core.module';
 import { COMPONENTS } from './pages/components';
 import { AppComponent } from './app.component';
-import { ToastrModule } from 'ngx-toastr';
+
 
 @NgModule({
   declarations: [AppComponent, COMPONENTS],
@@ -26,14 +28,20 @@ import { ToastrModule } from 'ngx-toastr';
     // Add .withServerTransition() to support Universal rendering.
     // The application ID can be any identifier which is unique on
     // the page.
-    BrowserModule.withServerTransition({ appId: 'my-app' }),
+    BrowserModule.withServerTransition({appId: 'my-app'}),
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
 
-    ToastrModule.forRoot(), // ToastrModule added
+    ToastrModule.forRoot(),
+    LaddaModule.forRoot({
+      style: 'expand-right',
+      spinnerSize: 25,
+      spinnerColor: 'white',
+      spinnerLines: 10
+    }),
 
     // if you enabled service workers inside .angular-cli.json,
     // I suggest to use it, only for the production build

@@ -14,7 +14,7 @@
           <label for="password">Password</label>
           <input type="password" class="form-control" id="password" placeholder="Password" formControlName="password">
         </div>
-        <button type="submit" id="signInButton" class="btn btn-primary">Sign in and redirect to your profile!</button>
+        <button type="submit" id="signInButton" class="btn btn-primary" [ladda]="isLoggingIn">{{signInBtnText}}</button>
       </form>
     </div>
   </div>

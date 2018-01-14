@@ -27,6 +27,8 @@
 let RateLimit = require('express-rate-limit');
 
 const logger = require('../logger-winston');
+const config = require('../config');
+
 const APIS = require('./apis');
 
 const ctrlKeepAlive = require('../controllers/keepalive');
@@ -44,11 +46,11 @@ logger.warn('Initializing ratelimit to all apis');
 // only if you're behind a reverse proxy (Heroku, Bluemix, AWS if you use an ELB, custom Nginx setup, etc)
 // app.enable('trust proxy');
 let apiLimiter = new RateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // limit each IP to `max` requests per windowMs
-  delayAfter: 5, // begin slowing down responses after `delayAfter` requests
-  delayMs: 3 * 1000, // slow down subsequent responses by `delayMs` seconds per request
-  message: 'Too many requests from this IP, please try again after 15 minutes'
+  windowMs: config.RATELIMITER_WINDOW_MS, // window in ms to check
+  max: config.RATELIMITER_MAX, // limit each IP to `max` requests per windowMs
+  delayAfter: config.RATELIMITER_DELAY_AFTER, // begin slowing down responses after `delayAfter` requests
+  delayMs: config.RATELIMITER_DELAY_MS, // slow down subsequent responses by `delayMs` seconds per request
+  message: config.RATELIMITER_MESSAGE // message to show with a HTTP 429 status
 });
 
 

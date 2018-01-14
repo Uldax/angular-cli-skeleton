@@ -46,7 +46,7 @@ if (useDotenv === true) {
       break;
   }
 
-  const dotenv = require('dotenv').config({ path: dotenvPath });
+  const dotenv = require('dotenv').config({path: dotenvPath});
   if (dotenv.error) {
     throw dotenv.error;
   }
@@ -79,7 +79,11 @@ module.exports = {
   HELMET_HPKP_SHA256S_2: process.env.HELMET_HPKP_SHA256S_2 || 'ZyXwVu456=',
   HELMET_HPKP_REPORT_URI: process.env.HELMET_HPKP_REPORT_URI || 'https://example.com/hpkp-report',
   HELMET_EXPECT_CT_REPORT_URI: process.env.HELMET_EXPECT_CT_REPORT_URI || 'https://example.com/expect-ct-report',
-  REDIS_HOST: process.env.REDIS_HOST || 'localhost',
-  REDIS_PORT: process.env.REDIS_PORT || 6379,
-  REDIS_TTL: process.env.REDIS_TTL || 260
+
+  RATELIMITER_WINDOW_MS: process.env.RATELIMITER_WINDOW_MS || (15 * 60 * 1000),   // by default 15 minutes
+  RATELIMITER_MAX: process.env.RATELIMITER_MAX || 50,
+  RATELIMITER_DELAY_AFTER: process.env.RATELIMITER_DELAY_AFTER || 5,
+  RATELIMITER_DELAY_MS: process.env.RATELIMITER_DELAY_MS || (3 * 1000), // by default 3 seconds
+  RATELIMITER_MESSAGE: process.env.RATELIMITER_MESSAGE || 'Too many requests from this IP, please try again after 15 minutes',
+
 };

@@ -27,8 +27,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
-import { AuthService } from '../../core/services/auth/auth.service';
+import { AuthResponse, AuthService } from '../../core/services/auth/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { HttpErrorResponse } from '@angular/common/http';
 
 /**
  * Component to login
@@ -40,6 +41,9 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   formModel: FormGroup;
+
+  isLoggingIn = false;
+  signInBtnText = 'Sign in!';
 
   private loginSubscription: Subscription;
 
@@ -64,18 +68,31 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.isLoggingIn = true;
+    this.signInBtnText = 'Signing in...';
+
     this.loginSubscription = this.authService
       .login({
         username: this.formModel.value.username,
         password: this.formModel.value.password
       })
       .subscribe(
-        resp => {
+        (resp: AuthResponse) => {
+          this.isLoggingIn = false;
+          this.signInBtnText = 'Sign in!';
           this.toastr.success('Welcome!', 'Login successful!', { closeButton: true });
           this.router.navigate(['/profile']);
         },
-        err => {
-          this.toastr.error('Username or password not valid!', 'Login error!', { closeButton: true });
+        (err: HttpErrorResponse) => {
+          this.isLoggingIn = false;
+          this.signInBtnText = 'Sign in!';
+
+          if (err.status === 429) {
+            // too many requests
+            this.toastr.error('Too many requests!', 'Login error!', { closeButton: true });
+          } else {
+            this.toastr.error('Username or password not valid!', 'Login error!', { closeButton: true });
+          }
         }
       );
   }

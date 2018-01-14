@@ -314,7 +314,9 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
+// we need this because 'cookie' is true in csrf
 app.use(cookieParser());
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -325,18 +327,19 @@ app.use(compression());
 logger.warn('Initializing REST apis and CSRF');
 
 // --------------------------------------- ROUTES ---------------------------------------
-// enable middleware CSRF by csurf package [NOT helmet]
+// Enable middleware CSRF by csurf package [NOT helmet]
 // before app.use(APIS.BASE_API_PATH, routesApi); to protect their,
-// but after session and/or cookie initialization
+// but after session and/or cookie initialization.
+// csrf requires cookieParser
 // app.use(csrf({cookie: true}));
-
-// catch bad csrf token
+//
+// // catch bad csrf token
 // app.use((err, req, res, next) => {
 //   if (err.code !== 'EBADCSRFTOKEN') return next(err);
 //   // handle CSRF token errors here
 //   res.status(403).json({message: 'session has expired or form tampered with'});
 // });
-
+//
 // app.use((req, res, next) => {
 //   res.cookie('XSRF-TOKEN', req.csrfToken());
 //   next();
@@ -349,7 +352,7 @@ app.use(APIS.BASE_API_PATH, routesApi);
 
 
 app.get('*', (req, res) => {
-  res.sendfile(pathFrontEndIndex);
+  res.sendFile(pathFrontEndIndex);
 });
 
 // catch 404 and forward to error handler
