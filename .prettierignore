@@ -53,6 +53,7 @@ node-express-server/
 **/.gitignore
 **/.prettierignore
 **/.snyk
+**/dependency-check-report.html
 
 **/.DS_Store
 **/Thumbs.db

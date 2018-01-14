@@ -20,6 +20,7 @@ const APIS = require('./routes/apis');
 let _ = require('lodash');
 let express = require('express');
 let bodyParser = require('body-parser');
+let cookieParser = require('cookie-parser');
 // var redis = require('redis'); // TODO
 // var ratelimit = require('ratelimit'); // TODO
 let compression = require('compression');
@@ -30,7 +31,6 @@ let path = require('path');
 let app = express();
 
 let morgan = require('morgan');
-let bluebird = require('bluebird');
 
 // --------------------------------------------------------
 // -----------------------Redis init-----------------------
@@ -95,7 +95,7 @@ let jwtOptions = passportConfig.buildJwtOptions(ExtractJwt.fromAuthHeaderAsBeare
 // jwtOptions.secretOrKey = 'secret key bla bla';
 
 passport.use(
-  new JwtStrategy(jwtOptions, function(jwt_payload, done) {
+  new JwtStrategy(jwtOptions, (jwt_payload, done) => {
     console.log('payload received', jwt_payload);
 
     if (!jwt_payload) {
@@ -180,14 +180,14 @@ app.use(helmet());
 
 // --SEC-- - hidePoweredBy: X-Powered-By forced to a fake value to
 // hide the default 'express' value [helmet]
-app.use(helmet.hidePoweredBy({ setTo: config.HELMET_HIDE_POWERED_BY }));
+app.use(helmet.hidePoweredBy({setTo: config.HELMET_HIDE_POWERED_BY}));
 
 // --SEC-- - noCache to disable client-side caching [helmet]
 // I don't want this for better performances (leave commented :))
-app.use(helmet.noCache());
+// app.use(helmet.noCache());
 
 // --SEC-- - referrer-policy to hide the Referer header [helmet]
-app.use(helmet.referrerPolicy({ policy: config.HELMET_REFERRER_POLICY }));
+app.use(helmet.referrerPolicy({policy: config.HELMET_REFERRER_POLICY}));
 
 // --SEC-- - Public Key Pinning (hpkp): HTTPS certificates can be forged,
 //    allowing man-in-the middle attacks.
@@ -219,7 +219,7 @@ app.use(
       sandbox: ['allow-forms', 'allow-scripts', 'allow-same-origin', 'allow-popups'],
       frameSrc: [`'self'`], //frame-src is deprecated
       childSrc: [`'self'`],
-      connectSrc: [`'self'`, 'ws://localhost:3000', 'ws://localhost:3001', 'ws://localhost:3100', 'ws://localhost:3300'],
+      connectSrc: [`'self'`, 'ws://localhost:3000', 'ws://localhost:3001', 'ws://localhost:3100', 'ws://localhost:3300', 'https://api.github.com'],
       reportUri: '/report-violation',
       objectSrc: [`'none'`]
     },
@@ -260,7 +260,7 @@ app.use(
 logger.warn(`Initializing morgan (logger of req, res and so on... It's different from winston logger)`);
 if (!config.isCI() && !config.isTest()) {
   // Disable morgan while testing to prevent very big log with useless information
-  app.use(morgan('combined', { stream: logger.stream }));
+  app.use(morgan('combined', {stream: logger.stream}));
 }
 
 console.log('pathFrontEndFolder', pathFrontEndFolder);
@@ -272,7 +272,7 @@ logger.warn('Initializing bodyparser');
 
 // parse application/x-www-form-urlencoded
 // for easier testing with Postman or plain HTML forms
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: false}));
 // parse application/json
 app.use(bodyParser.json());
 
@@ -283,16 +283,15 @@ app.use(hpp());
 
 logger.warn('Initializing passportjs');
 
-passport.serializeUser(function(user, done) {
-  console.log('serializing user', user);
+passport.serializeUser((user, done) => {
   done(null, user);
 });
 
-passport.deserializeUser(function(user, done) {
-  console.log('deserializing user ', user);
+passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
+app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -305,127 +304,59 @@ logger.warn('Initializing REST apis and CSRF');
 // enable middleware CSRF by csurf package [NOT helmet]
 // before app.use(APIS.BASE_API_PATH, routesApi); to protect their,
 // but after session and/or cookie initialization
-// app.use(csrf());
-// app.use(function (req, res, next) {
-//   res.cookie('XSRF-TOKEN', req.csrfToken());
-//   res.locals.csrftoken = req.csrfToken();
-//   next();
+app.use(csrf({cookie: true}));
+
+// catch bad csrf token
+// app.use((err, req, res, next) => {
+//   if (err.code !== 'EBADCSRFTOKEN') return next(err);
+//   // handle CSRF token errors here
+//   res.status(403).json({message: 'session has expired or form tampered with'});
 // });
+
+app.use((req, res, next) => {
+  res.cookie('XSRF-TOKEN', req.csrfToken());
+  next();
+});
 
 // APIs for all route protected with CSRF (all routes except for angular log's service)
 let routesApi = require('./routes/index')(express, passport);
 app.use(APIS.BASE_API_PATH, routesApi);
 // --------------------------------------------------------------------------------------
 
-logger.warn('Initializing static path for both index.html and admin.html');
-
-// catch bad csrf token
-app.use(function(err, req, res, next) {
-  if (err.code !== 'EBADCSRFTOKEN') {
-    return next(err);
-  }
-  // handle CSRF token errors here
-  res.status(403).json({ message: 'session has expired or form tampered with' });
+app.get('*', function(request, response) {
+  response.sendfile(pathFrontEndIndex);
 });
 
 // catch 404 and forward to error handler
-// app.use(function (req, res, next) {
-//   let err = new Error('Not Found');
-//   err.status = 404;
-//   next(err);
-// });
+// taken from https://github.com/expressjs/express/blob/master/examples/error-pages/index.js
+app.use((req, res, next) => {
+  res.status(404).json({
+    message: 'Not found',
+    error: {}
+  });
+});
 
-// error handlers
-// Catch unauthorised errors
-// app.use(function (err, req, res) {
-//   if (err.name === 'UnauthorizedError') {
-//     res.status(401);
-//     res.json({ message: `${err.name}: ${err.message}`});
-//   }
-// });
-//
-// // development error handler
-// // will print stacktrace
-// if (app.get('env') === 'development') {
-//   app.use(function (err, req, res) {
-//     res.status(err.status || 500);
-//     res.render('error', {
-//       message: err.message,
-//       error: err
-//     });
-//   });
-// }
+// development error handler
+// will print stacktrace
+if (!config.isProd()) {
+  app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(err.status || 500).json({
+      message: err.message,
+      error: err
+    });
+  });
+}
 
 // production error handler
 // no stacktraces leaked to user
-// app.use(function (err, req, res) {
-//   res.status(err.status || 500);
-//   res.render('error', {
-//     message: err.message,
-//     error: {}
-//   });
-// });
-
-// app.get('/api/keepalive', function(req, res) {
-//   console.log('inside keepaline');
-//   res.json({ message: 'Express is up!' });
-//   // res.status(200).success();
-// });
-//
-// app.post('/api/login', function(req, res) {
-//   console.log('post', req.body);
-//   let username = req.body.username;
-//   let password = req.body.password;
-//   // usually this would be a database call:
-//   let user = db.db[_.findIndex(db.db, o => o && o.credential && o.credential.username === username && o.credential.password === password)];
-//   if (!user || !user.credential) {
-//     res.status(401).json({ message: 'no such user found' });
-//     return;
-//   }
-//
-//   console.log('user: ', user);
-//
-//   if (user.credential.password === req.body.password) {
-//     // from now on we'll identify the user by the id and the id is the only personalized value that goes into our token
-//     let payload = { id: user.credential.id };
-//     console.log('payload', payload);
-//     let token = jwt.sign(getJwtToSign(payload), jwtOptions.secretOrKey);
-//     console.log('token', token);
-//
-//     let indexLoggedUser = db.tokens.findIndex(o => o && (o.token === token || o.userId === user.credential.id));
-//
-//     if (indexLoggedUser !== -1) {
-//       db.tokens.splice(indexLoggedUser, 1); // remove element
-//       db.tokens.push({ token: token, userId: user.credential.id });
-//     } else {
-//       db.tokens.push({ token: token, userId: user.credential.id });
-//     }
-//     // tokenMap.set(token, user.credential.id);
-//
-//     console.log('db.tokens', db.tokens);
-//
-//     res.status(200).json({ token: token });
-//   } else {
-//     res.status(401).json({ message: 'passwords did not match' });
-//   }
-// });
-// app.get('/api/secret', passport.authenticate('jwt', { session: false }), function(req, res) {
-//   // console.log(req.get('Authorization')); // to debug authentication data
-//   res.json({ message: 'This is a secret message from an authenticated rest API' });
-// });
-//
-// app.get('/api/logout', passport.authenticate('jwt', { session: false }), function(req, res) {
-//   console.log('req.headers.authorization is ', req.headers.authorization);
-//   console.log('req.user is ', req.user);
-//
-//   let currentToken = req.headers.authorization.replace('Bearer ', '');
-//   let currentUser = req.user;
-//   db.tokens = db.tokens.filter(o => o && currentToken && currentUser && o.token !== currentToken && o.userId !== currentUser.id);
-//
-//   console.log('db.tokens after logout', db.tokens);
-//   res.status(200).json({ message: 'Logged out' });
-// });
-
-app.listen(3000, function() {
-  console.log('Express running');
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    message: err.message, // if you wan to hide this, use a text like 'Unknown error'
+    error: {}
+  });
 });
+
+
+
+app.listen(3000, () => console.log('Express running'));

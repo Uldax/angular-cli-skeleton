@@ -75,3 +75,5 @@ docs
 .scannerwork/
 /reports/
 
+# OWASP dependency check
+dependency-check-report.html
