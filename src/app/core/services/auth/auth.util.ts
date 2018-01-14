@@ -2,9 +2,7 @@
 export const TOKEN_NAME = 'token';
 
 // all external urls to bypass the auth.interceptor preventing wrong Authorization headers
-export const EXTERNAL_URLS: string[] = [
-  'https://api.github.com'
-];
+export const EXTERNAL_URLS: string[] = ['https://api.github.com'];
 
 // these should be in auth.service, but there is a bug in Angular and I cannot inject auth.service into interceptors without throwing expection,
 // so at the moment I found this solution.

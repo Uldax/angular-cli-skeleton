@@ -68,7 +68,7 @@ export class GithubService {
    * @returns A Observable<GithubUser> with data inside.
    */
   getGithubUser(): Observable<GithubUser> {
-    return this.http.get<GithubUser>('https://api.github.com/users/Ks89',{headers: {}});
+    return this.http.get<GithubUser>('https://api.github.com/users/Ks89', { headers: {} });
   }
 
   /**
@@ -76,6 +76,6 @@ export class GithubService {
    * @returns A Observable<GithubUser> with data inside.
    */
   getGithubKs89Organizations(): Observable<GithubOrg> {
-    return this.http.get<GithubOrg>('https://api.github.com/users/Ks89/orgs', {headers: {}});
+    return this.http.get<GithubOrg>('https://api.github.com/users/Ks89/orgs', { headers: {} });
   }
 }

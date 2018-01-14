@@ -7,11 +7,9 @@ import { EXTERNAL_URLS } from './auth.util';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
-  constructor() {
-  }
+  constructor() {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-
     // fon some urls I shouldn't add my Authentication header (valid only for my server),
     // in particular for external urls, like Github, Google and so on...
     if (!!EXTERNAL_URLS.find((url: string) => request.url.startsWith(url))) {

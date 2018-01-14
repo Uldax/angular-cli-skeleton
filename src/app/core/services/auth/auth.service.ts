@@ -42,9 +42,7 @@ export interface AuthResponse {
 
 @Injectable()
 export class AuthService {
-
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) {}
 
   isLoggedIn(tokenName: string = TOKEN_NAME): boolean {
     return isLoggedInUtil(tokenName);
