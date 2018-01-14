@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
@@ -38,7 +38,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['home.scss'],
   templateUrl: 'home.html'
 })
-export class HomeComponent implements OnDestroy {
+export class HomeComponent implements OnInit, OnDestroy {
   formModel: FormGroup;
 
   private loginSubscription: Subscription;
@@ -49,6 +49,13 @@ export class HomeComponent implements OnDestroy {
       username: [null, Validators.required],
       password: [null, Validators.required]
     });
+  }
+
+  ngOnInit() {
+    if (this.authService.isLoggedIn()) {
+      // if already logged in, redicert to the profile page
+      this.router.navigate(['/profile']);
+    }
   }
 
   onLogin() {
