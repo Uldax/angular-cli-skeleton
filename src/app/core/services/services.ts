@@ -22,17 +22,17 @@
  * SOFTWARE.
  */
 
-import { ExampleService } from './example.service';
+import { SecretService } from './secret.service';
 import { GithubService } from './github.service';
-import { AuthService } from './auth.service';
-import { AuthGuard } from './auth-guard.service';
+import { AuthService } from './auth/auth.service';
+import { AuthGuard } from './auth/auth-guard.service';
 
-export { ExampleService } from './example.service';
+export { SecretService } from './secret.service';
 export { GithubService } from './github.service';
-export { AuthService } from './auth.service';
-export { AuthGuard } from './auth-guard.service';
+export { AuthService } from './auth/auth.service';
+export { AuthGuard } from './auth/auth-guard.service';
 
 /**
  * Array of core services
  */
-export const CORE_SERVICES: any[] = [ExampleService, GithubService, AuthService, AuthGuard];
+export const CORE_SERVICES: any[] = [SecretService, GithubService, AuthService, AuthGuard];

@@ -27,7 +27,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
 import { PageHeader } from '../../shared/components/components';
-import { ExampleService } from '../../core/services/example.service';
+import { SecretService } from '../../core/services/secret.service';
 
 import { Store } from '@ngrx/store';
 import * as fromPageNum from './reducers';
@@ -50,7 +50,7 @@ export class LazyComponent implements OnInit, OnDestroy {
   private pageNumSubscription: Subscription;
   private exampleServiceSubscription: Subscription;
 
-  constructor(private exampleService: ExampleService, private store: Store<fromPageNum.State>) {
+  constructor(private exampleService: SecretService, private store: Store<fromPageNum.State>) {
     this.pageHeader = new PageHeader('LAZY', '');
 
     this.pageNum$ = this.store.select(fromPageNum.getPageNum);

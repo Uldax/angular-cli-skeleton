@@ -36,9 +36,9 @@ import { Store } from '@ngrx/store';
 import * as fromRoot from '../../core/reducers/hello-example';
 import * as example from '../../core/actions/hello-example';
 
-import { ExampleService, MessageResponse } from '../../core/services/example.service';
+import { SecretService, MessageResponse } from '../../core/services/secret.service';
 import { GithubOrg, GithubService } from '../../core/services/github.service';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '../../core/services/auth/auth.service';
 
 import { PageHeader } from '../../shared/components/components';
 
@@ -78,7 +78,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     private authService: AuthService,
     private router: Router,
-    private exampleService: ExampleService,
+    private exampleService: SecretService,
     private githubService: GithubService,
     private store: Store<fromRoot.State>
   ) {

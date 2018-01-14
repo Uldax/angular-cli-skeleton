@@ -27,7 +27,7 @@ import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs/Subscription';
 
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
 import { ToastrService } from 'ngx-toastr';
 
 /**

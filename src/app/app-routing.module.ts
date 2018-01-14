@@ -28,7 +28,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ServiceWorkerComponent } from './pages/sw/sw.component';
 import { NotFoundComponent } from './pages/404/not-found.component';
-import { AuthGuard } from './core/services/auth-guard.service';
+import { AuthGuard } from './core/services/auth/auth-guard.service';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },

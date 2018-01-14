@@ -25,9 +25,12 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { CORE_SERVICES } from './services/services';
 import { throwIfAlreadyLoaded } from './module-import-guard';
+import { TokenInterceptor } from './services/auth/auth.interceptor';
+import { JwtInterceptor } from './services/auth/jwt.interceptor';
 
 /**
  * Core module that you can import only one time into the main module.
@@ -37,14 +40,24 @@ import { throwIfAlreadyLoaded } from './module-import-guard';
   imports: [CommonModule, RouterModule],
   exports: [],
   declarations: [],
-  providers: [CORE_SERVICES]
+  providers: [
+    CORE_SERVICES,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
+      multi: true
+    }
+  ]
 })
 export class CoreModule {
-  constructor(
-    @Optional()
-    @SkipSelf()
-    parentModule: CoreModule
-  ) {
+  constructor(@Optional()
+              @SkipSelf()
+                parentModule: CoreModule) {
     throwIfAlreadyLoaded(parentModule, 'CoreModule');
   }
 }

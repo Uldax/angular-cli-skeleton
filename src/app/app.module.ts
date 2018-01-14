@@ -18,7 +18,6 @@ import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core/core.module';
 import { COMPONENTS } from './pages/components';
 import { AppComponent } from './app.component';
-import { HttpModule } from '@angular/http';
 import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
@@ -30,7 +29,6 @@ import { ToastrModule } from 'ngx-toastr';
     BrowserModule.withServerTransition({ appId: 'my-app' }),
     BrowserAnimationsModule,
     HttpClientModule,
-    HttpModule,
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,

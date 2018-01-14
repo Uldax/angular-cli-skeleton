@@ -27,8 +27,6 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { AuthService } from './auth.service';
-
 export interface MessageResponse {
   message: string;
 }
@@ -37,14 +35,14 @@ export interface MessageResponse {
  * Example of a protected Angular Service
  */
 @Injectable()
-export class ExampleService {
-  constructor(private http: HttpClient, private authService: AuthService) {}
+export class SecretService {
+  constructor(private http: HttpClient) {}
 
   /**
    * Method protected by authentication.
    * @returns An Observable<MessageResponse> with a message inside.
    */
   getExample(): Observable<MessageResponse> {
-    return this.http.get<MessageResponse>('/api/secret', { headers: this.authService.getAuthHeaders() });
+    return this.http.get<MessageResponse>('/api/secret');
   }
 }

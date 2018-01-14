@@ -18,7 +18,7 @@ angular-cli-skeleton/
  │ │ │ ├─reducers/                * folder of ngrx reducers
  │ │ │ │ └─hello.example.ts       * hello-example ngrx reducer
  │ │ │ ├─services/                * services of the CoreModule
- │ │ │ │ ├─example.service.ts     * example of a synchronous service
+ │ │ │ │ ├─secret.service.ts      * example of a service call with authentication
  │ │ │ │ ├─github.service.ts      * example of an asynchronous service with HttpClient
  │ │ │ │ └─services.ts            * export an array of services to easely import into the module's definition
  │ │ │ ├─core.module.ts           * definition of the CoreModule

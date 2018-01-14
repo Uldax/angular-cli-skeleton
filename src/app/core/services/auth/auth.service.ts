@@ -23,10 +23,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 import { tap } from 'rxjs/operators';
+
+import { isLoggedIn as isLoggedInUtil, removeToken as removeTokenUtil, setToken as setTokenUtil, TOKEN_NAME } from './auth.util';
 
 export interface User {
   username: string;
@@ -38,31 +40,14 @@ export interface AuthResponse {
   token?: string;
 }
 
-const TOKEN_NAME = 'token';
-
 @Injectable()
 export class AuthService {
-  token: string;
 
   constructor(private http: HttpClient) {
-    // get existing token from local storage (if available/previously logged in)
-    this.token = this.getToken();
   }
 
   isLoggedIn(tokenName: string = TOKEN_NAME): boolean {
-    return !!localStorage.getItem(tokenName);
-  }
-
-  getToken(tokenName: string = TOKEN_NAME): string | null {
-    return localStorage.getItem(tokenName);
-  }
-
-  setToken(token: string, tokenName: string = TOKEN_NAME) {
-    localStorage.setItem(tokenName, token);
-  }
-
-  removeToken(tokenName: string = TOKEN_NAME) {
-    localStorage.removeItem(tokenName);
+    return isLoggedInUtil(tokenName);
   }
 
   login(user: User): Observable<AuthResponse> {
@@ -71,21 +56,14 @@ export class AuthService {
         // login successful if there's a jwt token in the response
         const token = resp.token;
         if (token) {
-          this.token = token;
           // store token in local storage to keep user logged in
-          this.setToken(token);
+          setTokenUtil(token);
         }
       })
     );
   }
 
   logout(): Observable<AuthResponse> {
-    return this.http.get<AuthResponse>('/api/logout', { headers: this.getAuthHeaders() }).pipe(tap(() => this.removeToken()));
-  }
-
-  getAuthHeaders(): HttpHeaders {
-    let headers = new HttpHeaders();
-    headers = headers.set('Authorization', 'Bearer ' + this.getToken());
-    return headers;
+    return this.http.get<AuthResponse>('/api/logout').pipe(tap(() => removeTokenUtil()));
   }
 }
