@@ -45,9 +45,8 @@ let _ = require('lodash');
 let express = require('express');
 let bodyParser = require('body-parser');
 let cookieParser = require('cookie-parser');
-// var redis = require('redis'); // TODO
-// var ratelimit = require('ratelimit'); // TODO
 let compression = require('compression');
+let redis = require('redis');
 
 let Utils = require('./util');
 let db = require('./db');
@@ -328,7 +327,7 @@ logger.warn('Initializing REST apis and CSRF');
 // enable middleware CSRF by csurf package [NOT helmet]
 // before app.use(APIS.BASE_API_PATH, routesApi); to protect their,
 // but after session and/or cookie initialization
-app.use(csrf({cookie: true}));
+// app.use(csrf({cookie: true}));
 
 // catch bad csrf token
 // app.use((err, req, res, next) => {
@@ -337,10 +336,10 @@ app.use(csrf({cookie: true}));
 //   res.status(403).json({message: 'session has expired or form tampered with'});
 // });
 
-app.use((req, res, next) => {
-  res.cookie('XSRF-TOKEN', req.csrfToken());
-  next();
-});
+// app.use((req, res, next) => {
+//   res.cookie('XSRF-TOKEN', req.csrfToken());
+//   next();
+// });
 
 // APIs for all route protected with CSRF (all routes except for angular log's service)
 let routesApi = require('./routes/index')(express, passport);

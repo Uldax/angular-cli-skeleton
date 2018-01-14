@@ -24,14 +24,17 @@
 
 'use strict';
 
+const redis = require('redis');
+// const ratelimit = require('ratelimit');
+
 const APIS = require('./apis');
 
 const ctrlKeepAlive = require('../controllers/keepalive');
 const ctrlSecret = require('../controllers/secret');
 const ctrlAuth = require('../controllers/auth');
 
-module.exports = function(express, passport) {
-  let router = express.Router();
+module.exports = (express, passport) => {
+  const router = express.Router();
 
   //-----------------------------------------------------------------------------------------
   //----------------------------------------public-------------------------------------------
@@ -41,6 +44,22 @@ module.exports = function(express, passport) {
   router.get(APIS.GET_KEEPALIVE, [ctrlKeepAlive.keepAlive]);
 
   //login
+
+  // const userBasedRatelimit = ratelimit({
+  //   db: redis.createClient(),
+  //   duration: 60000,
+  //   max: 10,
+  //   id: context => context.body.username
+  // });
+  //
+  // const ipBasedRatelimit = ratelimit({
+  //   db: redis.createClient(),
+  //   duration: 60000,
+  //   max: 10,
+  //   id: context => context.ip
+  // });
+
+
   router.post(APIS.POST_LOGIN, [ctrlAuth.login]);
 
   //-----------------------------------------------------------------------------------------
@@ -48,10 +67,10 @@ module.exports = function(express, passport) {
   //-----------------------------------------------------------------------------------------
 
   //secret
-  router.get(APIS.GET_SECRET, [passport.authenticate('jwt', { session: true }), ctrlSecret.secret]);
+  router.get(APIS.GET_SECRET, [passport.authenticate('jwt', {session: true}), ctrlSecret.secret]);
 
   // logout
-  router.get(APIS.GET_LOGOUT, [passport.authenticate('jwt', { session: true }), ctrlAuth.logout]);
+  router.get(APIS.GET_LOGOUT, [passport.authenticate('jwt', {session: true}), ctrlAuth.logout]);
 
   module.exports = router;
   return router;

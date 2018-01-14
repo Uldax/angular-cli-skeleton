@@ -22,11 +22,9 @@
  * SOFTWARE.
  */
 
-
 'use strict';
 
 const _ = require('lodash');
-let jwt = require('jsonwebtoken');
 
 class Utils {
   constructor() {}
@@ -68,50 +66,6 @@ class Utils {
     // convertedDate > systemDate
     return convertedDate.getTime() > new Date().getTime();
   }
-
-  // This method returns true if the parameter is NOT acceptable, i.e.
-  // is a function OR
-  // is _isNotValidJavascriptObject OR
-  // is null OR
-  // is undefined OR
-  // is NaN;
-  // false otherwise.
-  static isNotAcceptableValue(param) {
-    return _isNotAcceptableValue(param);
-  }
-
-  static isAcceptableValue(param) {
-    return _isAcceptableValue(param);
-  }
-
-  // Returns true if the parameter is NOT a valid Javascript
-  //    Object for this application, i.e.
-  // is ArrayBuffer OR
-  // is Buffer OR
-  // is Uint8Array OR
-  // is Error OR
-  // is Map OR
-  // is WeakMap OR
-  // is Set OR
-  // is WeakSet OR
-  // is Symbol OR
-  // is RegExp OR
-  // false otherwise.
-  static isNotValidJavascriptObject(param) {
-    return _isNotValidJavascriptObject(param);
-  }
-
-  static isNotValidArray(param) {
-    return _isNotValidArray(param);
-  }
-
-  static isSet(param) {
-    return _isSet(param);
-  }
-
-  static isMap(param) {
-    return _isMap(param);
-  }
 }
 
 // ---------- private functions that I can call inside this class ----------
@@ -120,28 +74,12 @@ function _isNotAcceptableValue(param) {
   return _.isFunction(param) || _isNotValidJavascriptObject(param) || _.isNil(param) || _.isNaN(param);
 }
 
-function _isAcceptableValue(param) {
-  return !_isNotAcceptableValue(param);
-}
-
 function _isNotValidJavascriptObject(p) {
   return _.isBuffer(p) || _.isError(p) || _.isRegExp(p) || _.isSymbol(p) || _isSet(p) || _isMap(p) || _isNotValidArray(p);
 }
 
 function _isNotValidArray(p) {
   return _.isArrayBuffer(p) || _.isTypedArray(p);
-}
-
-function _isNotValidNumber(p) {
-  return !_.isNumber(p) || _.isNaN(p);
-}
-
-function _isNotStringArrayObject(p) {
-  return !_isStringOrArrayOrObject(p);
-}
-
-function _isStringOrArrayOrObject(p) {
-  return _.isString(p) || _.isArray(p) || _.isObject(p);
 }
 
 function _isSet(p) {

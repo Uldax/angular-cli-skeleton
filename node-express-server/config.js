@@ -42,7 +42,6 @@ if (useDotenv === true) {
       break;
     default:
     case 'development':
-      console.log('---reading dotenv');
       dotenvPath = '.env';
       break;
   }

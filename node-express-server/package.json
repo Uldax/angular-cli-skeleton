@@ -33,6 +33,7 @@
     "passport": "^0.3.2",
     "passport-jwt": "^3.0.1",
     "ratelimiter": "^3.0.3",
+    "redis": "^2.8.0",
     "winston": "^2.4.0"
   },
   "devDependencies": {

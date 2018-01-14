@@ -24,7 +24,7 @@
 
 'use strict';
 
-let logger = require('../logger-winston');
+const logger = require('../logger-winston');
 
 /**
  * @api {get} /api/keepalive get keepalive
@@ -41,7 +41,7 @@ let logger = require('../logger-winston');
  *     "message": "Express is up!"
  *   }
  */
-module.exports.keepAlive = function(req, res) {
+module.exports.keepAlive = (req, res) => {
   logger.debug('REST keepAlive');
   console.log('inside keepalive');
   res.json({ message: 'Server is up and running!' });

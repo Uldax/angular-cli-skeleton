@@ -25,11 +25,13 @@
 'use strict';
 
 const _ = require('lodash');
-let logger = require('../logger-winston');
-let db = require('../db');
-let jwt = require('jsonwebtoken');
-let passportConfig = require('../passport-config');
-let jwtOptions = passportConfig.getJwtOptions();
+const logger = require('../logger-winston');
+const db = require('../db');
+const jwt = require('jsonwebtoken');
+
+const passportConfig = require('../passport-config');
+const jwtOptions = passportConfig.getJwtOptions();
+
 /**
  * @api {post} /api/login Login as local user.
  * @apiVersion 0.0.1
@@ -74,10 +76,11 @@ module.exports.login = (req, res) => {
     return;
   }
 
-  let username = req.body.username;
-  let password = req.body.password;
+  const username = req.body.username;
+  const password = req.body.password;
+
   // usually this would be a database call:
-  let user = db.db[_.findIndex(db.db, o => o && o.credential && o.credential.username === username && o.credential.password === password)];
+  const user = db.db[_.findIndex(db.db, o => o && o.credential && o.credential.username === username && o.credential.password === password)];
   if (!user || !user.credential) {
     res.status(401).json({ message: 'Incorrect username or password' });
     return;
@@ -89,10 +92,10 @@ module.exports.login = (req, res) => {
     // from now on we'll identify the user by the id and the id is the only personalized value that goes into our token
     let payload = { id: user.credential.id };
     console.log('payload', payload);
-    let token = jwt.sign(getJwtToSign(payload), jwtOptions.secretOrKey);
+    const token = jwt.sign(getJwtToSign(payload), jwtOptions.secretOrKey);
     console.log('token', token);
 
-    let indexLoggedUser = db.tokens.findIndex(o => o && (o.token === token || o.userId === user.credential.id));
+    const indexLoggedUser = db.tokens.findIndex(o => o && (o.token === token || o.userId === user.credential.id));
 
     if (indexLoggedUser !== -1) {
       db.tokens.splice(indexLoggedUser, 1); // remove element
@@ -137,8 +140,8 @@ module.exports.logout = (req, res) => {
   console.log('req.headers.authorization is ', req.headers.authorization);
   console.log('req.user is ', req.user);
 
-  let currentToken = req.headers.authorization.replace('Bearer ', '');
-  let currentUser = req.user;
+  const currentToken = req.headers.authorization.replace('Bearer ', '');
+  const currentUser = req.user;
   db.tokens = db.tokens.filter(o => o && currentToken && currentUser && o.token !== currentToken && o.userId !== currentUser.id);
 
   console.log('db.tokens after logout', db.tokens);
@@ -146,7 +149,7 @@ module.exports.logout = (req, res) => {
 };
 
 function getJwtToSign(thisObject) {
-  let expiry = new Date();
+  const expiry = new Date();
   expiry.setTime(expiry.getTime() + 600000); //valid for 10 minutes (10*60*1000)
   return {
     id: thisObject.id,

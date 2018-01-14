@@ -24,8 +24,7 @@
 
 'use strict';
 
-const _ = require('lodash');
-let logger = require('../logger-winston');
+const logger = require('../logger-winston');
 
 /**
  * @api {post} /api/secret Get a secret message
@@ -51,7 +50,7 @@ let logger = require('../logger-winston');
  *     "message": "This is a secret message from an authenticated rest API"
  *   }
  */
-module.exports.secret = function(req, res) {
+module.exports.secret = (req, res) => {
   logger.debug('REST secret called');
   res.status(200).json({ message: 'This is a secret message from an authenticated rest API' });
 };
