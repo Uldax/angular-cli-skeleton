@@ -13,17 +13,27 @@
     "npm": ">=5.2.0"
   },
   "scripts": {
-    "start": "node server.js",
-    "start:watch": "nodemon server.js"
+    "start": "nodemon server.js"
   },
   "dependencies": {
+    "bluebird": "^3.5.1",
     "body-parser": "^1.15.2",
+    "compression": "^1.7.1",
+    "csurf": "^1.9.0",
+    "dotenv": "^4.0.0",
+    "expect-ct": "^0.1.0",
     "express": "^4.14.0",
+    "express-content-length-validator": "^1.0.0",
     "express-session": "^1.15.6",
+    "helmet": "^3.9.0",
+    "hpp": "^0.2.2",
     "jsonwebtoken": "^7.1.9",
     "lodash": "^4.16.4",
+    "morgan": "^1.9.0",
     "passport": "^0.3.2",
-    "passport-jwt": "^3.0.1"
+    "passport-jwt": "^3.0.1",
+    "ratelimiter": "^3.0.3",
+    "winston": "^2.4.0"
   },
   "devDependencies": {
     "nodemon": "^1.14.11"
