@@ -321,6 +321,7 @@ app.use(passport.session());
 // compress all requests using gzip
 app.use(compression());
 
+
 logger.warn('Initializing REST apis and CSRF');
 
 // --------------------------------------- ROUTES ---------------------------------------
@@ -346,8 +347,9 @@ let routesApi = require('./routes/index')(express, passport);
 app.use(APIS.BASE_API_PATH, routesApi);
 // --------------------------------------------------------------------------------------
 
-app.get('*', function(request, response) {
-  response.sendfile(pathFrontEndIndex);
+
+app.get('*', (req, res) => {
+  res.sendfile(pathFrontEndIndex);
 });
 
 // catch 404 and forward to error handler
@@ -379,7 +381,6 @@ app.use((err, req, res, next) => {
     error: {}
   });
 });
-
 
 
 app.listen(3000, () => console.log('Express running'));

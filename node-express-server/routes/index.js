@@ -24,17 +24,36 @@
 
 'use strict';
 
-const redis = require('redis');
-// const ratelimit = require('ratelimit');
+let RateLimit = require('express-rate-limit');
 
+const logger = require('../logger-winston');
 const APIS = require('./apis');
 
 const ctrlKeepAlive = require('../controllers/keepalive');
 const ctrlSecret = require('../controllers/secret');
 const ctrlAuth = require('../controllers/auth');
 
-module.exports = (express, passport) => {
-  const router = express.Router();
+
+logger.warn('Initializing ratelimit to all apis');
+// --SEC--- Brute Force Protection
+// Brute forcing is the systematically enumerating of all possible candidates a solution and checking
+// whether each candidate satisfies the problem's statement. In web applications a login endpoint
+// can be the perfect candidate for this.
+// To protect your applications from these kind of attacks you have to implement
+// some kind of rate-limiting
+// only if you're behind a reverse proxy (Heroku, Bluemix, AWS if you use an ELB, custom Nginx setup, etc)
+// app.enable('trust proxy');
+let apiLimiter = new RateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 50, // limit each IP to `max` requests per windowMs
+  delayAfter: 5, // begin slowing down responses after `delayAfter` requests
+  delayMs: 3 * 1000, // slow down subsequent responses by `delayMs` seconds per request
+  message: 'Too many requests from this IP, please try again after 15 minutes'
+});
+
+
+module.exports = function (express, passport) {
+  let router = express.Router();
 
   //-----------------------------------------------------------------------------------------
   //----------------------------------------public-------------------------------------------
@@ -44,23 +63,7 @@ module.exports = (express, passport) => {
   router.get(APIS.GET_KEEPALIVE, [ctrlKeepAlive.keepAlive]);
 
   //login
-
-  // const userBasedRatelimit = ratelimit({
-  //   db: redis.createClient(),
-  //   duration: 60000,
-  //   max: 10,
-  //   id: context => context.body.username
-  // });
-  //
-  // const ipBasedRatelimit = ratelimit({
-  //   db: redis.createClient(),
-  //   duration: 60000,
-  //   max: 10,
-  //   id: context => context.ip
-  // });
-
-
-  router.post(APIS.POST_LOGIN, [ctrlAuth.login]);
+  router.post(APIS.POST_LOGIN, [apiLimiter, ctrlAuth.login]);
 
   //-----------------------------------------------------------------------------------------
   //------------------------------------authenticated----------------------------------------
